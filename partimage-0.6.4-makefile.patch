@@ -1,0 +1,57 @@
+--- Makefile.in.orig	2004-04-29 23:08:52.000000000 +0300
++++ Makefile.in	2006-11-03 00:06:37.000000000 +0200
+@@ -590,45 +590,23 @@
+ 	@echo "/etc/pam.d/partimaged"
+ 
+ install-data-local:
+-	$(mkinstalldirs) ${sysconfdir}
+-	$(mkinstalldirs) ${sysconfdir}/partimaged
++	$(mkinstalldirs) ${DESTDIR}/${sysconfdir}
++	$(mkinstalldirs) ${DESTDIR}/${sysconfdir}/partimaged
+ 
+-	if test ! -f ${sysconfdir}/partimaged/partimagedusers ; then \
++	if test ! -f ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers.new ; then \
+ 	echo "# note: '#' introduces comments" > \
+-          ${sysconfdir}/partimaged/partimagedusers ;\
++          ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers.new ;\
+ 	echo -n "#add only users allowed to " >>  \
+-           ${sysconfdir}/partimaged/partimagedusers ;\
+-	echo "connect partimaged" >> ${sysconfdir}/partimaged/partimagedusers ;\
++           ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers.new ;\
++	echo "connect partimaged" >> ${DESTDIR}${sysconfdir}/partimaged/partimagedusers.new ;\
+ 	echo "# (only one login per line)" >> \
+-           ${sysconfdir}/partimaged/partimagedusers ;\
+-	echo "" >> ${sysconfdir}/partimaged/partimagedusers ;\
++           ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers.new ;\
++	echo "" >> ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers.new ;\
+ 	echo "#sample # user 'sample' is allowed to connect partimaged" >> \
+-           ${sysconfdir}/partimaged/partimagedusers ;\
+-	chmod 600 ${sysconfdir}/partimaged/partimagedusers ;\
+-	chown partimag.root ${sysconfdir}/partimaged/partimagedusers ;\
++           ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers.new ;\
+ 	fi 
+ 
+-	$(mkinstalldirs) ${infodir}
+-	$(INSTALL_DATA) AUTHORS ${infodir}/AUTHORS
+-	$(INSTALL_DATA) BUGS ${infodir}/BUGS
+-	$(INSTALL_DATA) COPYING ${infodir}/COPYING
+-	$(INSTALL_DATA) ChangeLog ${infodir}/ChangeLog
+-	$(INSTALL_DATA) INSTALL ${infodir}/INSTALL
+-	$(INSTALL_DATA) README ${infodir}/README
+-	$(INSTALL_DATA) README.partimaged ${infodir}/README.partimaged
+-	$(INSTALL_DATA) TODO ${infodir}/TODO
+-	$(INSTALL_DATA) partimage.lsm ${infodir}/partimage.lsm
+-
+ uninstall-local:
+-	-rm -f ${infodir}/AUTHORS
+-	-rm -f ${infodir}/BUGS
+-	-rm -f ${infodir}/COPYING
+-	-rm -f ${infodir}/ChangeLog
+-	-rm -f ${infodir}/INSTALL
+-	-rm -f ${infodir}/README
+-	-rm -f ${infodir}/README.partimaged
+-	-rm -f ${infodir}/TODO
+-	-rm -f ${infodir}/partimage.lsm
+ 
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+ # Otherwise a system limit (for SysV at least) may be exceeded.

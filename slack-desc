@@ -1,0 +1,11 @@
+partimage: Partition Image - backup/restore partitions
+partimage:
+partimage: Partition Image is a Linux/UNIX utility which saves partitions in
+partimage: many formats (ext2/ext3, reiser3, FAT16/32, HPFS, JFS, XFS, UFS, HFS)
+partimage: to an image file. The image file can be compressed in the GNU zip
+partimage: or bzip2 formats to save disk space, and split into multiple files
+partimage: Partition Image will only copy the data from the used portions of
+partimage: a partition and can work with large, very full partitions.
+partimage:
+partimage: Packaged by Georgi D. Sotirov <gdsotirov@dir.bg>
+partimage:

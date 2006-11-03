@@ -1,0 +1,71 @@
+#!/bin/sh
+# Runs partimage server
+
+# Where to store the images
+imagestore=/var/spool/partimaged
+
+start() {
+# Check if partimaged is already running
+  status 1>/dev/null 2>&1
+  RET=$?
+  if [ $RET -ne 0 ]; then
+    echo -n "Starting partimaged "
+    /usr/sbin/partimaged -D --dest $imagestore
+    RETVAL=$?
+  fi
+  echo
+  return $RETVAL
+}
+
+stop() {
+  echo -n "Stopping partimaged "
+  killall -TERM /usr/sbin/partimaged
+  RETVAL=$?
+  echo
+  return $RETVAL
+}
+
+status() {
+  PIDS=$(pidof partimaged)
+  if [ "$PIDS" == "" ]; then
+    echo "partimaged is not running!"
+    return 1
+  else
+    echo "partimaged is running at pid(s) ${PIDS}."
+    return 0
+  fi
+}
+
+restart() {
+  stop
+  start
+}	
+
+reload() {
+  restart
+}	
+
+case "$1" in
+start)
+	start
+	;;
+stop)
+	stop
+	;;
+reload|restart)
+	restart
+	;;
+status)
+	status
+	;;
+test)
+	status 1>/dev/null 2>&1
+	RET=$?
+	echo "RET= '$RET'"
+	;;
+*)
+	echo "Usage: partimaged {start|stop|restart|status}"
+	exit 1
+esac
+
+exit $RETVAL
