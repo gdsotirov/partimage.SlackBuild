@@ -19,29 +19,17 @@ partuser=partimag
 partconfdir="etc/partimaged"
 partdatadir="var/spool/partimaged"
 
-# Create the partimage account
-if ! grep $partuser etc/passwd  > /dev/null 2>&1
-then
-  useradd -c "Partition Image daemon" -g root -u $partuid -d /tmp -s /bin/false $partuser
-  res=$?
-  if [ $res -ne 0 ]
-  then
-    echo "User with UID $partuid already exists! You'll have to delete it and add a $partuser user manually!"
-  echo "Run this command: \"useradd -c 'Partition Image daemon' -u UID -g root -d /tmp -s /bin/false $partuser\""
-  echo "And select a free value for UID that is below 500 (check /etc/passwd)"
-  fi
-fi
+# Inform the user to create partimage account
+echo "******************************** Important ********************************"
+echo "NOTE: If you want to use the daemon, you need to add its user like this:"
+echo "  # useradd -c \"Partition Image daemon\" -g root -u $partuid -d /tmp -s /bin/false $partuser"
+echo "And then change your configuration files permissions:"
+echo "  # chown $partuser:root /$partconfdir"
+echo "  # chown $partuser:root /$partconfdir/partimagedusers"
+echo "  # chown $partuser:root /$partdatadir"
+echo "******************************** Important ******************************"
 
 # Handle the partimage configuration files
 config etc/rc.d/rc.partimaged.new
 config ${partconfdir}/partimagedusers.new
-
-# The partimag user must own the configuration directory and the users file
-chown ${partuser}:root ${partconfdir}
-chown ${partuser}:root ${partconfdir}/partimagedusers
-chmod 600 ${partconfdir}/partimagedusers
-
-# The partimag user must own the dataspool directory
-chown ${partuser}:root ${partdatadir}
-chmod 600 ${partdatadir}
 
