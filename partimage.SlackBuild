@@ -9,7 +9,7 @@
 NAME=partimage
 VERSION=0.6.4
 REL=1
-BUILD=1
+BUILD=2
 
 cd $TMP
 tar -jxvf $CWD/$NAME-$VERSION-$REL.tar.bz2
@@ -48,9 +48,10 @@ install -d -m 755 $PKG/usr/man/man8
 install -m 644 $SRC/debian/partimaged.8 $PKG/usr/man/man8
 
 # Create local state dir
-install -d -m 755 $PKG/var/spool/partimaged
+install -d -m 600 -o root -g root $PKG/var/spool/partimaged
 
 sbin_perms $PKG
+chmod 600 $PKG/etc/partimaged
 gzip_man $PKG
 DOCFILES="$DOCFILES BOOT-ROOT-creation.txt BOOTDSK.sh FORMAT FUTURE PACKAGES SURVEY TESTS"
 create_docs $PKG $NAME-$VERSION
