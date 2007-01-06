@@ -1,6 +1,6 @@
---- Makefile.in.orig	2004-04-29 23:08:52.000000000 +0300
-+++ Makefile.in	2006-11-03 00:06:37.000000000 +0200
-@@ -590,45 +590,23 @@
+--- Makefile.in.orig	2006-12-15 18:25:07.000000000 +0200
++++ Makefile.in	2007-01-07 00:17:13.000000000 +0200
+@@ -687,35 +687,23 @@
  	@echo "/etc/pam.d/partimaged"
  
  install-data-local:
@@ -10,25 +10,26 @@
 +	$(mkinstalldirs) ${DESTDIR}/${sysconfdir}/partimaged
  
 -	if test ! -f ${sysconfdir}/partimaged/partimagedusers ; then \
-+	if test ! -f ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers.new ; then \
++	if test ! -f ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers ; then \
  	echo "# note: '#' introduces comments" > \
 -          ${sysconfdir}/partimaged/partimagedusers ;\
-+          ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers.new ;\
++          ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers ;\
  	echo -n "#add only users allowed to " >>  \
 -           ${sysconfdir}/partimaged/partimagedusers ;\
 -	echo "connect partimaged" >> ${sysconfdir}/partimaged/partimagedusers ;\
-+           ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers.new ;\
-+	echo "connect partimaged" >> ${DESTDIR}${sysconfdir}/partimaged/partimagedusers.new ;\
++           ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers ;\
++	echo "connect partimaged" >> ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers ;\
  	echo "# (only one login per line)" >> \
 -           ${sysconfdir}/partimaged/partimagedusers ;\
 -	echo "" >> ${sysconfdir}/partimaged/partimagedusers ;\
-+           ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers.new ;\
-+	echo "" >> ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers.new ;\
++           ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers ;\
++	echo "" >> ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers ;\
  	echo "#sample # user 'sample' is allowed to connect partimaged" >> \
 -           ${sysconfdir}/partimaged/partimagedusers ;\
 -	chmod 600 ${sysconfdir}/partimaged/partimagedusers ;\
--	chown partimag.root ${sysconfdir}/partimaged/partimagedusers ;\
-+           ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers.new ;\
+-	chown partimag:root ${sysconfdir}/partimaged/partimagedusers ;\
++           ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers ;\
++	chmod 600 ${DESTDIR}/${sysconfdir}/partimaged/partimagedusers ;\
  	fi 
  
 -	$(mkinstalldirs) ${infodir}
@@ -43,15 +44,5 @@
 -	$(INSTALL_DATA) partimage.lsm ${infodir}/partimage.lsm
 -
  uninstall-local:
--	-rm -f ${infodir}/AUTHORS
--	-rm -f ${infodir}/BUGS
--	-rm -f ${infodir}/COPYING
--	-rm -f ${infodir}/ChangeLog
--	-rm -f ${infodir}/INSTALL
--	-rm -f ${infodir}/README
--	-rm -f ${infodir}/README.partimaged
--	-rm -f ${infodir}/TODO
--	-rm -f ${infodir}/partimage.lsm
- 
- # Tell versions [3.59,3.63) of GNU make to not export all variables.
- # Otherwise a system limit (for SysV at least) may be exceeded.
+ 	-rm -f ${infodir}/AUTHORS
+ 	-rm -f ${infodir}/BUGS
