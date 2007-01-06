@@ -7,25 +7,24 @@
 . /etc/slack-package.conf
 
 NAME=partimage
-VERSION=0.6.4
-REL=1
-BUILD=2
+VERSION=0.6.5
+BUILD=1
 
 cd $TMP
-tar -jxvf $CWD/$NAME-$VERSION-$REL.tar.bz2
-SRC=$TMP/$NAME-$VERSION-$REL
+tar -jxvf $CWD/$NAME-$VERSION.tar.bz2
+SRC=$TMP/$NAME-$VERSION
 cd $SRC
 fix_source
 
 # Patch some files for proper build
-patch -p0 -b < $CWD/$NAME-$VERSION-makefile.patch
-patch -p0 -b < $CWD/$NAME-$VERSION-configure.patch
+patch -p0 -b < "$CWD/$NAME-$VERSION-Makefile.in.patch"
 
+CFLAGS=$SLKCFLAGS \
 CXXFLAGS=$SLKCFLAGS \
 ./configure --build=$ARCH-pc-linux-gnu \
+            --sysconfdir=/etc \
             --prefix=/usr \
             --localstatedir=/var \
-            --sysconfdir=/etc \
             --enable-ssl=yes
 make
 
@@ -35,27 +34,27 @@ mkdir -p $PKG
 make DESTDIR=$PKG install-strip
 
 # Install daemon start/stop/restart script
-install -d -m 755 $PKG/etc/rc.d
-install -m 644 $CWD/rc.partimaged.new $PKG/etc/rc.d
+install -m 755 -d $PKG/etc/rc.d
+install -m 644    $CWD/rc.partimaged.new $PKG/etc/rc.d
 
 # Install man pages
-install -d -m 755 $PKG/usr/man
-install -d -m 755 $PKG/usr/man/man1
-install -m 644 $SRC/debian/partimage.1 $PKG/usr/man/man1
-install -d -m 755 $PKG/usr/man/man5
-install -m 644 $CWD/partimagedusers.5 $PKG/usr/man/man5
-install -d -m 755 $PKG/usr/man/man8
-install -m 644 $SRC/debian/partimaged.8 $PKG/usr/man/man8
+install -m 755 -d $PKG/usr/man
+install -m 755 -d $PKG/usr/man/man1
+install -m 644    $SRC/doc/en/man/partimage.1 $PKG/usr/man/man1
+install -m 755 -d $PKG/usr/man/man5
+install -m 644    $SRC/doc/en/man/partimagedusers.5 $PKG/usr/man/man5
+install -m 755 -d $PKG/usr/man/man8
+install -m 644    $SRC/doc/en/man/partimaged.8 $PKG/usr/man/man8
 
 # Create local state dir
-install -d -m 600 -o root -g root $PKG/var/spool/partimaged
+install -d -m 755 $PKG/var/spool/partimaged
 
 sbin_perms $PKG
-chmod 600 $PKG/etc/partimaged
 gzip_man $PKG
 DOCFILES="$DOCFILES BOOT-ROOT-creation.txt BOOTDSK.sh FORMAT FUTURE PACKAGES SURVEY TESTS"
 create_docs $PKG $NAME-$VERSION
 ( cd $PKG; strip_bin; strip_lib; )
+rm -rf $PKG/usr/doc/$NAME-$VERSION/doc
 
 mkdir -p $PKG/install
 install -m 644 $CWD/doinst.sh $PKG/install
@@ -63,8 +62,7 @@ install -m 644 $CWD/slack-desc $PKG/install
 install -m 644 $CWD/slack-required $PKG/install
 mkdir -p $PKG/usr/src/slackbuilds/$NAME-$VERSION
 install -m 644 $CWD/doinst.sh $PKG/usr/src/slackbuilds/$NAME-$VERSION
-install -m 644 $CWD/$NAME-$VERSION-configure.patch $PKG/usr/src/slackbuilds/$NAME-$VERSION
-install -m 644 $CWD/$NAME-$VERSION-makefile.patch $PKG/usr/src/slackbuilds/$NAME-$VERSION
+install -m 644 $CWD/$NAME-$VERSION-"Makefile.in.patch" $PKG/usr/src/slackbuilds/$NAME-$VERSION
 install -m 644 $CWD/rc.partimaged.new $PKG/usr/src/slackbuilds/$NAME-$VERSION
 install -m 644 $CWD/slack-desc $PKG/usr/src/slackbuilds/$NAME-$VERSION
 install -m 644 $CWD/slack-required $PKG/usr/src/slackbuilds/$NAME-$VERSION
@@ -72,6 +70,7 @@ install -m 644 $CWD/$NAME.SlackBuild $PKG/usr/src/slackbuilds/$NAME-$VERSION
 
 cd $PKG
 PKGNAME=$NAME-$VERSION-$ARCH-$BUILD$MYIN
+PKG_DIR=${PKG_DIR:-$TMP}
 makepkg -l y -c n $PKG_DIR/$PKGNAME.tgz
 cd $PKG_DIR
 md5sum $PKGNAME.tgz > $PKGNAME.tgz.md5
@@ -81,4 +80,5 @@ if [ "$1" == "--cleanup" ]; then
   rm -r $SRC
   rm -r $PKG
 fi
+
 
