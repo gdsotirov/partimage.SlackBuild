@@ -33,3 +33,12 @@ echo "******************************** Important ******************************"
 config etc/rc.d/rc.partimaged.new
 config ${partconfdir}/partimagedusers.new
 
+# The partimag user must own the configuration directory and the users file
+chown daemon:root ${partconfdir}
+chown daemon:root ${partconfdir}/partimagedusers
+chmod 600 ${partconfdir}/partimagedusers
+
+# The partimag user must own the dataspool directory
+chown daemon:root ${partdatadir}
+chmod 600 ${partdatadir}
+
