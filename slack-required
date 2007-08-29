@@ -1,6 +1,4 @@
-bzip2
-glibc
-newt
-openssl
-slang
-zlib
+bzip2 >= 1.0.4
+newt >= 0.52.2
+openssl >= 0.9.8e
+zlib >= 1.2.3
