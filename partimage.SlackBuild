@@ -4,10 +4,10 @@
 # Written by Georgi D. Sotirov <gdsotirov@dir.bg>
 #
 
-. /etc/slack-package.conf
+. ../slack-package.conf
 
 NAME=partimage
-VERSION=0.6.5
+VERSION=0.6.6
 BUILD=1
 
 cd $TMP
@@ -21,10 +21,13 @@ patch -p0 -b < "$CWD/$NAME-$VERSION-Makefile.in.patch"
 
 CFLAGS=$SLKCFLAGS \
 CXXFLAGS=$SLKCFLAGS \
-./configure --build=$ARCH-pc-linux-gnu \
-            --sysconfdir=/etc \
+./configure --build=$ARCH-slackware-linux \
+            --host=$ARCH-slackware-linux \
             --prefix=/usr \
+            --sysconfdir=/etc \
             --localstatedir=/var \
+	    --enable-shared=yes \
+	    --enable-static=no \
             --enable-ssl=yes
 make
 
@@ -33,6 +36,7 @@ mkdir -p $PKG
 
 make DESTDIR=$PKG install-strip
 
+mv $PKG/etc/partimaged/partimagedusers $PKG/etc/partimaged/partimagedusers.new
 # Install daemon start/stop/restart script
 install -m 755 -d $PKG/etc/rc.d
 install -m 644    $CWD/rc.partimaged.new $PKG/etc/rc.d
@@ -51,7 +55,7 @@ install -d -m 755 $PKG/var/spool/partimaged
 
 sbin_perms $PKG
 gzip_man $PKG
-DOCFILES="$DOCFILES BOOT-ROOT-creation.txt BOOTDSK.sh FORMAT FUTURE PACKAGES SURVEY TESTS"
+DOCFILES="$DOCFILES BOOT-ROOT.txt FORMAT FUTURE"
 create_docs $PKG $NAME-$VERSION
 ( cd $PKG; strip_bin; strip_lib; )
 rm -rf $PKG/usr/doc/$NAME-$VERSION/doc
