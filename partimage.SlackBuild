@@ -7,7 +7,7 @@
 . ../slack-package.conf
 
 NAME=partimage
-VERSION=0.6.6
+VERSION=0.6.7
 BUILD=1
 
 cd $TMP
@@ -17,7 +17,7 @@ cd $SRC
 fix_source
 
 # Patch some files for proper build
-patch -p0 -b < "$CWD/$NAME-$VERSION-Makefile.in.patch"
+#patch -p0 -b < "$CWD/$NAME-$VERSION-Makefile.in.patch"
 
 CFLAGS=$SLKCFLAGS \
 CXXFLAGS=$SLKCFLAGS \
@@ -26,9 +26,10 @@ CXXFLAGS=$SLKCFLAGS \
             --prefix=/usr \
             --sysconfdir=/etc \
             --localstatedir=/var \
-	    --enable-shared=yes \
-	    --enable-static=no \
+            --enable-shared=yes \
+            --enable-static=no \
             --enable-ssl=yes
+
 make
 
 PKG="$TMP/package-$NAME"
@@ -42,13 +43,13 @@ install -m 755 -d $PKG/etc/rc.d
 install -m 644    $CWD/rc.partimaged.new $PKG/etc/rc.d
 
 # Install man pages
-install -m 755 -d $PKG/usr/man
-install -m 755 -d $PKG/usr/man/man1
-install -m 644    $SRC/doc/en/man/partimage.1 $PKG/usr/man/man1
-install -m 755 -d $PKG/usr/man/man5
-install -m 644    $SRC/doc/en/man/partimagedusers.5 $PKG/usr/man/man5
-install -m 755 -d $PKG/usr/man/man8
-install -m 644    $SRC/doc/en/man/partimaged.8 $PKG/usr/man/man8
+#install -m 755 -d $PKG/usr/man
+#install -m 755 -d $PKG/usr/man/man1
+#install -m 644    $SRC/doc/en/man/partimage.1 $PKG/usr/man/man1
+#install -m 755 -d $PKG/usr/man/man5
+#install -m 644    $SRC/doc/en/man/partimagedusers.5 $PKG/usr/man/man5
+#install -m 755 -d $PKG/usr/man/man8
+#install -m 644    $SRC/doc/en/man/partimaged.8 $PKG/usr/man/man8
 
 # Create local state dir
 install -d -m 755 $PKG/var/spool/partimaged
@@ -61,16 +62,17 @@ create_docs $PKG $NAME-$VERSION
 rm -rf $PKG/usr/doc/$NAME-$VERSION/doc
 
 mkdir -p $PKG/install
-install -m 644 $CWD/doinst.sh $PKG/install
-install -m 644 $CWD/slack-desc $PKG/install
+install -m 644 $CWD/doinst.sh      $PKG/install
+install -m 644 $CWD/slack-desc     $PKG/install
 install -m 644 $CWD/slack-required $PKG/install
+
 mkdir -p $PKG/usr/src/slackbuilds/$NAME-$VERSION
-install -m 644 $CWD/doinst.sh $PKG/usr/src/slackbuilds/$NAME-$VERSION
-install -m 644 $CWD/$NAME-$VERSION-"Makefile.in.patch" $PKG/usr/src/slackbuilds/$NAME-$VERSION
+install -m 644 $CWD/doinst.sh         $PKG/usr/src/slackbuilds/$NAME-$VERSION
+#install -m 644 $CWD/$NAME-$VERSION-"Makefile.in.patch" $PKG/usr/src/slackbuilds/$NAME-$VERSION
 install -m 644 $CWD/rc.partimaged.new $PKG/usr/src/slackbuilds/$NAME-$VERSION
-install -m 644 $CWD/slack-desc $PKG/usr/src/slackbuilds/$NAME-$VERSION
-install -m 644 $CWD/slack-required $PKG/usr/src/slackbuilds/$NAME-$VERSION
-install -m 644 $CWD/$NAME.SlackBuild $PKG/usr/src/slackbuilds/$NAME-$VERSION
+install -m 644 $CWD/slack-desc        $PKG/usr/src/slackbuilds/$NAME-$VERSION
+install -m 644 $CWD/slack-required    $PKG/usr/src/slackbuilds/$NAME-$VERSION
+install -m 644 $CWD/$NAME.SlackBuild  $PKG/usr/src/slackbuilds/$NAME-$VERSION
 
 cd $PKG
 PKGNAME=$NAME-$VERSION-$ARCH-$BUILD$MYIN
