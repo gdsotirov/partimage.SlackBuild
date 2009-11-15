@@ -1,4 +1,9 @@
-bzip2 >= 1.0.4
-newt >= 0.52.2
-openssl >= 0.9.8e
+bzip2 >= 1.0.5
+cxxlibs >= 6.0.10 | gcc-g++ >= 4.3.3
+gcc >= 4.3.3
+glibc-solibs >= 2.9
+linux-pam >= 1.1.0
+newt >= 0.52.10
+openssl >= 0.9.8k
+slang >= 2.1
 zlib >= 1.2.3
