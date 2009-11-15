@@ -7,17 +7,34 @@
 . ../slack-package.conf
 
 NAME=partimage
-VERSION=0.6.7
+VERSION=0.6.8
 BUILD=1
+
+TMP=${TMP:-/tmp}
+CWD=${CWD:-`pwd`}
+PKG_DIR=${PKG_DIR:-/tmp}
+
+if [ ! -e $TMP ]; then
+  mkdir -p $TMP # location to build the source
+fi
+
+SRC=$TMP/$NAME-$VERSION
+if [ -e $SRC -a -d $SRC ]; then
+  echo "Source directory '$SRC' already exists! Plaese, move it or remove it."
+  exit 1
+fi
+
+PKG=$TMP/package-$NAME
+if [ -e $PKG -a -d $PKG ]; then
+  echo "Package creation directory '$PKG' already exists! Please, move it or remove it."
+  exit 2
+fi
+mkdir -p $PKG
 
 cd $TMP
 tar -jxvf $CWD/$NAME-$VERSION.tar.bz2
-SRC=$TMP/$NAME-$VERSION
 cd $SRC
 fix_source
-
-# Patch some files for proper build
-#patch -p0 -b < "$CWD/$NAME-$VERSION-Makefile.in.patch"
 
 CFLAGS=$SLKCFLAGS \
 CXXFLAGS=$SLKCFLAGS \
@@ -26,60 +43,47 @@ CXXFLAGS=$SLKCFLAGS \
             --prefix=/usr \
             --sysconfdir=/etc \
             --localstatedir=/var \
+            --mandir=/usr/man \
+            --infodir=/usr/info \
             --enable-shared=yes \
             --enable-static=no \
-            --enable-ssl=yes
+            --enable-pam \
+            --enable-ssl=yes || exit 1
 
-make
-
-PKG="$TMP/package-$NAME"
-mkdir -p $PKG
-
-make DESTDIR=$PKG install-strip
+make -j4 || exit 2
+make DESTDIR=$PKG install || exit 3
 
 mv $PKG/etc/partimaged/partimagedusers $PKG/etc/partimaged/partimagedusers.new
 # Install daemon start/stop/restart script
 install -m 755 -d $PKG/etc/rc.d
 install -m 644    $CWD/rc.partimaged.new $PKG/etc/rc.d
 
-# Install man pages
-#install -m 755 -d $PKG/usr/man
-#install -m 755 -d $PKG/usr/man/man1
-#install -m 644    $SRC/doc/en/man/partimage.1 $PKG/usr/man/man1
-#install -m 755 -d $PKG/usr/man/man5
-#install -m 644    $SRC/doc/en/man/partimagedusers.5 $PKG/usr/man/man5
-#install -m 755 -d $PKG/usr/man/man8
-#install -m 644    $SRC/doc/en/man/partimaged.8 $PKG/usr/man/man8
-
 # Create local state dir
 install -d -m 755 $PKG/var/spool/partimaged
 
 sbin_perms $PKG
+( cd $PKG; strip_bin; strip_lib; )
 gzip_man $PKG
 DOCFILES="$DOCFILES BOOT-ROOT.txt FORMAT FUTURE"
 create_docs $PKG $NAME-$VERSION
-( cd $PKG; strip_bin; strip_lib; )
-rm -rf $PKG/usr/doc/$NAME-$VERSION/doc
 
 mkdir -p $PKG/install
-install -m 644 $CWD/doinst.sh      $PKG/install
-install -m 644 $CWD/slack-desc     $PKG/install
-install -m 644 $CWD/slack-required $PKG/install
+install -m 644 $CWD/doinst.sh      $PKG/install/doinst.sh
+install -m 644 $CWD/slack-desc     $PKG/install/slack-desc
+install -m 644 $CWD/slack-required $PKG/install/slack-required
 
 mkdir -p $PKG/usr/src/slackbuilds/$NAME-$VERSION
-install -m 644 $CWD/doinst.sh         $PKG/usr/src/slackbuilds/$NAME-$VERSION
-#install -m 644 $CWD/$NAME-$VERSION-"Makefile.in.patch" $PKG/usr/src/slackbuilds/$NAME-$VERSION
-install -m 644 $CWD/rc.partimaged.new $PKG/usr/src/slackbuilds/$NAME-$VERSION
-install -m 644 $CWD/slack-desc        $PKG/usr/src/slackbuilds/$NAME-$VERSION
-install -m 644 $CWD/slack-required    $PKG/usr/src/slackbuilds/$NAME-$VERSION
-install -m 644 $CWD/$NAME.SlackBuild  $PKG/usr/src/slackbuilds/$NAME-$VERSION
+install -m 644 $CWD/doinst.sh         $PKG/usr/src/slackbuilds/$NAME-$VERSION/doinst.sh
+install -m 644 $CWD/rc.partimaged.new $PKG/usr/src/slackbuilds/$NAME-$VERSION/rc.partimaged.new
+install -m 644 $CWD/slack-desc        $PKG/usr/src/slackbuilds/$NAME-$VERSION/slack-desc
+install -m 644 $CWD/slack-required    $PKG/usr/src/slackbuilds/$NAME-$VERSION/slack-required
+install -m 644 $CWD/$NAME.SlackBuild  $PKG/usr/src/slackbuilds/$NAME-$VERSION/$NAME.SlackBuild
 
 cd $PKG
 PKGNAME=$NAME-$VERSION-$ARCH-$BUILD$MYIN
-PKG_DIR=${PKG_DIR:-$TMP}
-makepkg -l y -c n $PKG_DIR/$PKGNAME.tgz
+makepkg -l y -c n $PKG_DIR/$PKGNAME.txz
 cd $PKG_DIR
-md5sum $PKGNAME.tgz > $PKGNAME.tgz.md5
+md5sum $PKGNAME.txz > $PKGNAME.txz.md5
 cat $PKG/install/slack-desc > $PKG_DIR/$PKGNAME.txt
 
 if [ "$1" == "--cleanup" ]; then
