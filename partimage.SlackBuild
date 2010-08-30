@@ -1,18 +1,18 @@
 #!/bin/sh
-
+#
 # SlackBuild for partimage
 # Written by Georgi D. Sotirov <gdsotirov@dir.bg>
+# Visit SlackPack at http://sotirov-bg.net/slackpack/
 #
 
 . ../slack-package.conf
 
 NAME=partimage
-VERSION=0.6.8
-BUILD=1
+VERSION=0.6.9
+BUILD=${BUILD:-1}
 
 TMP=${TMP:-/tmp}
 CWD=${CWD:-`pwd`}
-PKG_DIR=${PKG_DIR:-/tmp}
 
 if [ ! -e $TMP ]; then
   mkdir -p $TMP # location to build the source
@@ -32,10 +32,11 @@ fi
 mkdir -p $PKG
 
 cd $TMP
-tar -jxvf $CWD/$NAME-$VERSION.tar.bz2
+tar -xvf $CWD/$NAME-$VERSION.tar.bz2 || exit 1
 cd $SRC
 fix_source
 
+# Configure
 CFLAGS=$SLKCFLAGS \
 CXXFLAGS=$SLKCFLAGS \
 ./configure --build=$ARCH-slackware-linux \
@@ -45,22 +46,24 @@ CXXFLAGS=$SLKCFLAGS \
             --localstatedir=/var \
             --mandir=/usr/man \
             --infodir=/usr/info \
+            --docdir=/usr/doc/$NAME-$VERSION \
             --enable-shared=yes \
             --enable-static=no \
             --enable-pam \
-            --enable-ssl=yes || exit 1
+            --enable-ssl=yes || exit 2
 
-make -j4 || exit 2
-make DESTDIR=$PKG install || exit 3
+make -j4 || exit 3
+make DESTDIR=$PKG install || exit 4
 
 mv $PKG/etc/partimaged/partimagedusers $PKG/etc/partimaged/partimagedusers.new
 # Install daemon start/stop/restart script
 install -m 755 -d $PKG/etc/rc.d
-install -m 644    $CWD/rc.partimaged.new $PKG/etc/rc.d
+install -m 644    $CWD/rc.partimaged.new $PKG/etc/rc.d/rc.partimaged.new
 
 # Create local state dir
 install -d -m 755 $PKG/var/spool/partimaged
 
+# Prepare
 sbin_perms $PKG
 ( cd $PKG; strip_bin; strip_lib; )
 gzip_man $PKG
@@ -72,11 +75,12 @@ install -m 644 $CWD/doinst.sh      $PKG/install/doinst.sh
 install -m 644 $CWD/slack-desc     $PKG/install/slack-desc
 install -m 644 $CWD/slack-required $PKG/install/slack-required
 
-mkdir -p $PKG/usr/src/slackbuilds/$NAME-$VERSION
-install -m 644 $CWD/doinst.sh         $PKG/usr/src/slackbuilds/$NAME-$VERSION/doinst.sh
-install -m 644 $CWD/rc.partimaged.new $PKG/usr/src/slackbuilds/$NAME-$VERSION/rc.partimaged.new
+SBDIR=$PKG/usr/src/slackbuilds/$NAME-$VERSION
+mkdir -p $SBDIR
+install -m 644 $CWD/doinst.sh         $SBDIR/doinst.sh
 install -m 644 $CWD/slack-desc        $PKG/usr/src/slackbuilds/$NAME-$VERSION/slack-desc
 install -m 644 $CWD/slack-required    $PKG/usr/src/slackbuilds/$NAME-$VERSION/slack-required
+install -m 644 $CWD/rc.partimaged.new $PKG/usr/src/slackbuilds/$NAME-$VERSION/rc.partimaged.new
 install -m 644 $CWD/$NAME.SlackBuild  $PKG/usr/src/slackbuilds/$NAME-$VERSION/$NAME.SlackBuild
 
 cd $PKG
