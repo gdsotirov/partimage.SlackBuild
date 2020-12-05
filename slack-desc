@@ -8,4 +8,4 @@ partimage: Partition Image will only copy the data from the used portions of
 partimage: a partition and can work with large, very full partitions.
 partimage:
 partimage:
-partimage: Packaged by Georgi D. Sotirov <gdsotirov@dir.bg>
+partimage: Packaged by Georgi D. Sotirov <gdsotirov@gmail.com>
